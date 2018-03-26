@@ -22,12 +22,29 @@ const instructions = Platform.select({
 });
 
 type Props = {};
+let codePushOptions = { checkFrequency: CodePush.CheckFrequency.ON_APP_RESUME };
+
 export default class App extends Component<Props> {
+  codePushDownloadDidProgress(progress) {
+        console.log(progress.receivedBytes + " of " + progress.totalBytes + " received.");
+  }
+
+  componentWillMount() {
+  		CodePush.disallowRestart();//页面加载的禁止重启，在加载完了可以允许重启
+  	}
+
+  	componentDidMount(){
+  		CodePush.allowRestart();//允许重启，否则热更新不会生效
+  		CodePush.sync({
+  			installMode: CodePush.InstallMode.IMMEDIATE,
+  			updateDialog: false,
+  		})
+  	}
   render() {
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>
-          Welcome to React Native!
+            Oi Welcome to React Native!
         </Text>
         <Text style={styles.instructions}>
           To get started, edit App.js
@@ -40,6 +57,7 @@ export default class App extends Component<Props> {
   }
 }
 
+App = CodePush(codePushOptions) (App);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
